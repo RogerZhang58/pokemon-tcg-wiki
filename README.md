@@ -119,7 +119,7 @@ pokemon-tcg-wiki/
 
 - **[TCGdex](https://github.com/tcgdex/cards-database)** — Pokémon TCG 卡牌数据库，提供结构化卡牌元数据（HP/属性/弱点/抗性/赛制）。MIT License。
 - **[PTCG Live zh-mod](https://github.com/Hill-98/ptcg-live-zh-mod)** — PTCG Live 中文化模组，提供 14,272 张卡牌的简中译名及游戏文本翻译。[Paratranz 项目 #9617](https://paratranz.cn/projects/9617) 社区翻译。
-- **[mtg-wiki-hermes](https://github.com/RogerZhang58/mtg-wiki-hermes)** — 万智牌知识库助手，本项目参考其 Pipeline 架构设计思想。
+- **[Kuuusoda/magic-skill](https://github.com/Kuuusoda/magic-skill)** — 万智牌知识库工具链的开创性工作，mtg-wiki-hermes 的源头项目。本项目 Pipeline 架构思想经 mtg-wiki-hermes 传递至此。
 
 感谢以上项目的作者和贡献者。本项目的简中翻译数据来源于 PTCG Live zh-mod 社区翻译成果，未做修改。
 
