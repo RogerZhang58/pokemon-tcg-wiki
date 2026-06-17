@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-"""Enrich zh-matched cards with full TCGdex details."""
+"""Fast card enrichment: fetch full TCGdex details for zh-matched cards."""
 import json, sys, time, urllib.request
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 TOOLS_DIR = Path(__file__).resolve().parent
@@ -9,49 +10,46 @@ from utils import CARDS_DIR, ZH_MOD_DIR, normalize_card_id
 
 API = "https://api.tcgdex.net/v2/en/cards"
 
-def get(url):
-    for attempt in range(3):
+def get(cid):
+    for attempt in range(2):
         try:
-            req = urllib.request.Request(url, headers={"User-Agent": "pokemon-tcg-wiki/1.0"})
-            with urllib.request.urlopen(req, timeout=20) as r:
+            url = f"{API}/{cid}"
+            req = urllib.request.Request(url, headers={"User-Agent": "ptcg-wiki/1.0"})
+            with urllib.request.urlopen(req, timeout=15) as r:
                 return json.loads(r.read().decode())
-        except Exception as e:
-            if attempt == 2:
-                raise
-            time.sleep(1)
+        except:
+            time.sleep(0.5)
 
-# Get zh-matched IDs directly
+# Build zh-matched IDs
 names_en = json.load(open(ZH_MOD_DIR / "names.json"))
 names_zh = json.load(open(ZH_MOD_DIR / "databases_zh-CN/names.json"))
-zh_ids = []
+zh_ids = set()
 for h, ids in names_en.items():
     if h in names_zh:
         for cid in ids:
-            zh_ids.append(normalize_card_id(cid, "tcgdex"))
+            zh_ids.add(normalize_card_id(cid, "tcgdex"))
 
-print(f"zh-matched cards: {len(zh_ids)}")
+print(f"zh-matched: {len(zh_ids)} IDs")
 
-count = ok = skip = err = 0
-for cid in zh_ids:
-    card_path = CARDS_DIR / f"{cid}.json"
-    # Skip if already has full data
-    if card_path.exists():
-        with open(card_path) as f:
-            existing = json.load(f)
-        if existing.get("hp") is not None:
-            skip += 1
-            continue
-
-    try:
-        card = get(f"{API}/{cid}")
-        with open(card_path, "w", encoding="utf-8") as f:
+# Fetch all — overwrite existing files (summary → full)
+def fetch_and_save(cid):
+    card = get(cid)
+    if card:
+        with open(CARDS_DIR / f"{cid}.json", "w", encoding="utf-8") as f:
             json.dump(card, f, ensure_ascii=False)
-        ok += 1
-    except Exception as e:
-        err += 1
+        return True
+    return False
 
-    count += 1
-    if count % 1000 == 0:
-        print(f"  {count}/{len(zh_ids)} — ok:{ok} skip:{skip} err:{err}")
+ok = err = 0
+todo = sorted(zh_ids)
+with ThreadPoolExecutor(max_workers=8) as ex:
+    futs = {ex.submit(fetch_and_save, cid): cid for cid in todo}
+    for i, f in enumerate(as_completed(futs)):
+        if f.result():
+            ok += 1
+        else:
+            err += 1
+        if (i + 1) % 1000 == 0:
+            print(f"  {i+1}/{len(todo)} ok={ok} err={err}")
 
-print(f"Done: {count} processed — ok:{ok} skip:{skip} err:{err}")
+print(f"Done: ok={ok} err={err}")
