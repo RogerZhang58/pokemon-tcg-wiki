@@ -113,10 +113,20 @@ pokemon-tcg-wiki/
 - 招式名/文本约 47% 已由社区翻译，未覆盖部分暂用英文
 - 环境分析（meta）、收藏向功能不在 MVP 范围
 
+## 致谢
+
+本项目基于以下开源项目构建，特此致谢：
+
+- **[TCGdex](https://github.com/tcgdex/cards-database)** — Pokémon TCG 卡牌数据库，提供结构化卡牌元数据（HP/属性/弱点/抗性/赛制）。MIT License。
+- **[PTCG Live zh-mod](https://github.com/Hill-98/ptcg-live-zh-mod)** — PTCG Live 中文化模组，提供 14,272 张卡牌的简中译名及游戏文本翻译。[Paratranz 项目 #9617](https://paratranz.cn/projects/9617) 社区翻译。
+- **[mtg-wiki-hermes](https://github.com/RogerZhang58/mtg-wiki-hermes)** — 万智牌知识库助手，本项目参考其 Pipeline 架构设计思想。
+
+感谢以上项目的作者和贡献者。本项目的简中翻译数据来源于 PTCG Live zh-mod 社区翻译成果，未做修改。
+
 ## License
 
 MIT — Copyright (c) 2026 RogerZhang
 
-本项目独立于 [mtg-wiki-hermes](https://github.com/RogerZhang58/mtg-wiki-hermes)，仅参考其架构思想，不共用代码。
+本项目独立于 mtg-wiki-hermes，仅参考架构思想，不共用代码。
 
-Pokémon 是 Nintendo / Creatures / GAME FREAK 的商标。本项目为非官方社区项目。
+Pokémon 是 Nintendo / Creatures / GAME FREAK 的商标。本项目为非官方社区项目，与任天堂、宝可梦公司无关联。卡牌图片和数据的版权归其各自所有者。
