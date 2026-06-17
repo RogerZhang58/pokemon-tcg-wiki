@@ -1,0 +1,30 @@
+{
+  "source": "pokemon.cn + TCGdex",
+  "updated": "2026-06-17",
+  "notes": "Standard uses regulation marks (F/G/H). Expanded bans listed below.",
+  "standard": {
+    "regulation_marks": [
+      "F",
+      "G",
+      "H"
+    ],
+    "banned_cards": []
+  },
+  "expanded": {
+    "banned_cards_cn": [
+      {
+        "name": "玛夏多",
+        "reason": "特性：破罐破摔"
+      },
+      {
+        "name": "阿塞萝拉",
+        "reason": "官方禁用"
+      },
+      {
+        "name": "全满药",
+        "reason": "官方禁用"
+      }
+    ],
+    "banned_cards_intl": []
+  }
+}

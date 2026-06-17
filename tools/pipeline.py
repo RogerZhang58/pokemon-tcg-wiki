@@ -67,7 +67,8 @@ def decompose_question(question: str) -> dict:
         "规则", "rule", "怎么", "如何", "how", "what is",
         "特殊状态", "中毒", "灼伤", "麻痹", "睡眠", "混乱",
         "poison", "burn", "paralyze", "sleep", "confuse",
-        "回合", "turn", "能量", "energy",
+        "回合", "turn", "能量", "energy", "是什么", "什么是",
+        "说明", "解释", "定义", "define",
     ]
     format_keywords = [
         "禁", "ban", "禁止", "限制", "赛制", "format",
