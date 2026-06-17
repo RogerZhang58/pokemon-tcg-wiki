@@ -42,8 +42,11 @@ def build_cards_index(rebuild: bool = False) -> int:
     conn.execute(CARDS_FTS_SQL)
 
     # Clear existing data
-    conn.execute("DELETE FROM cards")
-    conn.execute("DELETE FROM cards_fts")
+    try:
+        conn.execute("DELETE FROM cards_fts")
+        conn.execute("DELETE FROM cards")
+    except Exception:
+        pass  # Table may not exist yet on first run
 
     card_files = sorted(CARDS_ZH_DIR.glob("*.json"))
     if not card_files:
