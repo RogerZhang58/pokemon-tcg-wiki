@@ -69,47 +69,92 @@ def clone_or_pull(repo_url: str, cache_dir: Path, force: bool = False) -> bool:
 
 
 def sync_tcgdex(force: bool = False) -> bool:
-    """Sync TCGdex cards-database: extract data/ → raw/data/."""
-    print("\n═══ Syncing TCGdex ═══")
+    """Sync TCGdex card data via REST API (returns clean JSON)."""
+    import json as _json
+    import urllib.request
+    import time
 
-    if not clone_or_pull(TCGDEX_REPO, TCGDEX_CACHE, force):
-        return False
+    print("\n═══ Syncing TCGdex (API) ═══")
+    API_BASE = "https://api.tcgdex.net/v2/en"
 
-    # TCGdex stores cards in data/<SetName>/<cardId>.json
-    # But newer versions may use different structure. Check common patterns.
-    tcgdex_data = TCGDEX_CACHE / "data"
+    def api_get(url: str) -> dict | list:
+        """GET with retry."""
+        for attempt in range(3):
+            try:
+                req = urllib.request.Request(url, headers={"User-Agent": "pokemon-tcg-wiki/1.0"})
+                with urllib.request.urlopen(req, timeout=30) as resp:
+                    return _json.loads(resp.read().decode())
+            except Exception as e:
+                if attempt == 2:
+                    print(f"  API error: {e}")
+                    raise
+                time.sleep(2)
 
-    if not tcgdex_data.exists():
-        print(f"  ERROR: 'data/' not found in TCGdex repo at {TCGDEX_CACHE}")
-        print(f"  Contents: {list(TCGDEX_CACHE.iterdir())[:10]}")
-        return False
+    # Get sets list
+    print("  Fetching sets list...")
+    sets = api_get(f"{API_BASE}/sets")
+    print(f"  {len(sets)} sets found")
 
-    # Count and copy card files
     card_count = 0
     set_count = 0
 
-    for set_dir in sorted(tcgdex_data.iterdir()):
-        if not set_dir.is_dir():
-            continue
-        set_count += 1
+    for s in sets:
+        set_id = s.get("id", "")
+        set_name = s.get("name", "")
+        card_total = s.get("cardCount", {}).get("total", 0)
 
-        # Copy set metadata
+        if not set_id:
+            continue
+
+        print(f"  [{set_id}] {set_name} ({card_total} cards)...", end=" ", flush=True)
+
+        try:
+            set_data = api_get(f"{API_BASE}/sets/{set_id}")
+        except Exception:
+            print("SKIP (API error)")
+            continue
+
+        set_cards = set_data.get("cards", [])
+
+        # Prepare set metadata
         set_meta = {
-            "id": set_dir.name,
+            "id": set_id,
+            "name": set_name,
+            "logo": s.get("logo", ""),
+            "symbol": s.get("symbol", ""),
+            "cardCount": s.get("cardCount", {}),
             "cards": [],
         }
 
-        for card_file in sorted(set_dir.glob("*.json")):
-            card_count += 1
-            dest = CARDS_DIR / card_file.name
-            shutil.copy2(card_file, dest)
-            set_meta["cards"].append(card_file.stem)
+        set_card_count = 0
+        for summary in set_cards:
+            card_id = summary.get("id", "")
+            if not card_id:
+                continue
+
+            # Fetch full card data
+            try:
+                card = api_get(f"{API_BASE}/cards/{card_id}")
+                time.sleep(0.15)  # Rate limit for individual card requests
+            except Exception:
+                continue
+
+            # Save individual card
+            dest = CARDS_DIR / f"{card_id}.json"
+            with open(dest, "w", encoding="utf-8") as f:
+                _json.dump(card, f, ensure_ascii=False)
+            set_card_count += 1
+            set_meta["cards"].append(card_id)
 
         # Save set metadata
-        import json
-        set_meta_path = SETS_DIR / f"{set_dir.name}.json"
+        set_meta_path = SETS_DIR / f"{set_id}.json"
         with open(set_meta_path, "w", encoding="utf-8") as f:
-            json.dump(set_meta, f, ensure_ascii=False, indent=2)
+            _json.dump(set_meta, f, ensure_ascii=False, indent=2)
+
+        card_count += set_card_count
+        set_count += 1
+        print(f"{set_card_count} cards")
+        time.sleep(0.3)  # Rate limit: ~3 req/s
 
     print(f"  Synced {card_count} cards from {set_count} sets")
     return True
