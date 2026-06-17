@@ -69,94 +69,80 @@ def clone_or_pull(repo_url: str, cache_dir: Path, force: bool = False) -> bool:
 
 
 def sync_tcgdex(force: bool = False) -> bool:
-    """Sync TCGdex card data via REST API (returns clean JSON)."""
+    """Sync TCGdex card data via REST API with pagination."""
     import json as _json
     import urllib.request
     import time
 
-    print("\n═══ Syncing TCGdex (API) ═══")
+    print("\n═══ Syncing TCGdex (API, paginated) ═══")
     API_BASE = "https://api.tcgdex.net/v2/en"
 
     def api_get(url: str) -> dict | list:
-        """GET with retry."""
         for attempt in range(3):
             try:
-                req = urllib.request.Request(url, headers={"User-Agent": "pokemon-tcg-wiki/1.0"})
+                req = urllib.request.Request(
+                    url, headers={"User-Agent": "pokemon-tcg-wiki/1.0"}
+                )
                 with urllib.request.urlopen(req, timeout=30) as resp:
                     return _json.loads(resp.read().decode())
             except Exception as e:
                 if attempt == 2:
-                    print(f"  API error: {e}")
                     raise
-                time.sleep(2)
+                time.sleep(1)
 
-    # Get sets list
-    print("  Fetching sets list...")
-    sets = api_get(f"{API_BASE}/sets")
-    print(f"  {len(sets)} sets found")
-
+    ITEMS_PER_PAGE = 100
+    page = 1
     card_count = 0
-    set_count = 0
+    set_cards = {}  # set_id → [card_ids]
 
-    for s in sets:
-        set_id = s.get("id", "")
-        set_name = s.get("name", "")
-        card_total = s.get("cardCount", {}).get("total", 0)
+    print("  Fetching cards (paginated, 100/page)...")
+    while True:
+        url = f"{API_BASE}/cards?pagination:page={page}&pagination:itemsPerPage={ITEMS_PER_PAGE}"
+        cards = api_get(url)
+        if not cards:
+            break
 
-        if not set_id:
-            continue
-
-        print(f"  [{set_id}] {set_name} ({card_total} cards)...", end=" ", flush=True)
-
-        try:
-            set_data = api_get(f"{API_BASE}/sets/{set_id}")
-        except Exception:
-            print("SKIP (API error)")
-            continue
-
-        set_cards = set_data.get("cards", [])
-
-        # Prepare set metadata
-        set_meta = {
-            "id": set_id,
-            "name": set_name,
-            "logo": s.get("logo", ""),
-            "symbol": s.get("symbol", ""),
-            "cardCount": s.get("cardCount", {}),
-            "cards": [],
-        }
-
-        set_card_count = 0
-        for summary in set_cards:
-            card_id = summary.get("id", "")
+        for card in cards:
+            card_id = card.get("id", "")
             if not card_id:
                 continue
 
-            # Fetch full card data
-            try:
-                card = api_get(f"{API_BASE}/cards/{card_id}")
-                time.sleep(0.15)  # Rate limit for individual card requests
-            except Exception:
-                continue
-
-            # Save individual card
+            # Save card
             dest = CARDS_DIR / f"{card_id}.json"
             with open(dest, "w", encoding="utf-8") as f:
                 _json.dump(card, f, ensure_ascii=False)
-            set_card_count += 1
-            set_meta["cards"].append(card_id)
+            card_count += 1
 
-        # Save set metadata
-        set_meta_path = SETS_DIR / f"{set_id}.json"
-        with open(set_meta_path, "w", encoding="utf-8") as f:
+            # Track by set
+            set_id = card.get("set", {}).get("id", "unknown") if isinstance(card.get("set"), dict) else "unknown"
+            set_cards.setdefault(set_id, []).append(card_id)
+
+        print(f"    Page {page}: {len(cards)} cards (total: {card_count})")
+        if len(cards) < ITEMS_PER_PAGE:
+            break
+        page += 1
+        time.sleep(0.3)
+
+    # Get set metadata
+    print(f"  {card_count} cards downloaded. Fetching set metadata...")
+    sets = api_get(f"{API_BASE}/sets")
+    for s in sets:
+        set_id = s.get("id", "")
+        if not set_id:
+            continue
+        set_meta = {
+            "id": set_id,
+            "name": s.get("name", ""),
+            "logo": s.get("logo", ""),
+            "symbol": s.get("symbol", ""),
+            "cardCount": s.get("cardCount", {}),
+            "cards": sorted(set_cards.get(set_id, [])),
+        }
+        meta_path = SETS_DIR / f"{set_id}.json"
+        with open(meta_path, "w", encoding="utf-8") as f:
             _json.dump(set_meta, f, ensure_ascii=False, indent=2)
 
-        card_count += set_card_count
-        set_count += 1
-        print(f"{set_card_count} cards")
-        time.sleep(0.3)  # Rate limit: ~3 req/s
-
-    print(f"  Synced {card_count} cards from {set_count} sets")
+    print(f"  Synced {card_count} cards from {len(sets)} sets")
     return True
 
 
