@@ -105,7 +105,7 @@ pokemon-tcg-wiki/
 |------|------|------|---------|
 | [TCGdex](https://github.com/tcgdex/cards-database) | 卡牌元数据（HP/属性/弱点/抗性/赛制） | 全卡池 | MIT |
 | [PTCG Live zh-mod](https://github.com/Hill-98/ptcg-live-zh-mod) | 简中译名（卡名/招式） | 卡名全覆盖 | 开源 |
-| 官方规则 PDF | 规则书/赛事手册/Errata | 待用户提供 | — |
+| 官方规则 PDF | 规则书/赛事手册/Errata | 简中官方 PDF (已收录) | © Pokémon |
 
 ## 限制
 

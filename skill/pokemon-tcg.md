@@ -51,7 +51,7 @@ Stage 4: VERDICT — 最终回答 + [校验: PASS | N/N]
 
 - **TCGdex** (MIT)：卡牌元数据（HP/属性/弱点/抗性/赛制）
 - **PTCG Live zh-mod** (Hill-98/ptcg-live-zh-mod)：简中翻译
-- **官方规则 PDF**：待用户提供
+- **官方规则 PDF**：已收录简中官方规则文档
 
 ## 使用注意
 
