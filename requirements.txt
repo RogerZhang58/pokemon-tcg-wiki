@@ -1,0 +1,11 @@
+# Pokemon TCG Wiki Hermes — Python dependencies
+# Core
+jsonschema>=4.0
+sqlite3-api>=2.0; python_version >= '3.11'
+
+# Text processing
+marker-pdf
+pymupdf
+
+# Testing
+pytest>=7.0
