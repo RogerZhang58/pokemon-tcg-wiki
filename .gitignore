@@ -4,6 +4,7 @@ raw/data/cards_zh/
 raw/data/sets/
 raw/zh_mod/
 raw/llm_trans/
+raw/.cache/
 
 # Cache
 tools/cache/
