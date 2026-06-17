@@ -18,7 +18,7 @@ metadata:
 
 宝可梦集换式卡牌游戏全知识库助手。
 
-基于 TCGdex（结构化卡牌元数据）+ PTCG Live zh-mod（简中翻译，100% 卡名覆盖），
+基于 TCGdex（结构化卡牌元数据）+ PTCG Live zh-mod（简中翻译），
 通过 4 阶段 Pipeline 回答宝可梦卡牌相关问题。
 
 ## 功能
@@ -50,13 +50,13 @@ Stage 4: VERDICT — 最终回答 + [校验: PASS | N/N]
 ## 数据源
 
 - **TCGdex** (MIT)：卡牌元数据（HP/属性/弱点/抗性/赛制）
-- **PTCG Live zh-mod** (Hill-98/ptcg-live-zh-mod)：简中翻译（卡名 100% 覆盖）
+- **PTCG Live zh-mod** (Hill-98/ptcg-live-zh-mod)：简中翻译
 - **官方规则 PDF**：待用户提供
 
 ## 使用注意
 
 - 简中赛制/轮替使用国际版数据（TCGdex legal 字段），非简中特有规则
-- 招式名/文本约 47% 已由社区翻译，未覆盖部分暂用英文
+- 招式名/文本部分已由社区翻译，未覆盖部分暂用英文
 - 回答末尾的校验行格式：`[校验: PASS | 3/3]`
 
 ## 安装

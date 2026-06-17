@@ -4,7 +4,7 @@
 
 宝可梦集换式卡牌游戏（Pokémon TCG）全知识库助手 — [Hermes Agent](https://hermes-agent.nousresearch.com) 平台 Skill。
 
-基于 **TCGdex**（结构化卡牌元数据）+ **PTCG Live zh-mod**（简中翻译，14,272 张卡名 100% 覆盖），通过 4 阶段 Pipeline + `validation.py` 硬校验回答宝可梦卡牌相关问题。
+基于 **TCGdex**（结构化卡牌元数据）+ **PTCG Live zh-mod**（简中翻译），通过 4 阶段 Pipeline + `validation.py` 硬校验回答宝可梦卡牌相关问题。
 
 ## 功能
 
@@ -103,14 +103,14 @@ pokemon-tcg-wiki/
 
 | 来源 | 提供 | 覆盖 | License |
 |------|------|------|---------|
-| [TCGdex](https://github.com/tcgdex/cards-database) | 卡牌元数据（HP/属性/弱点/抗性/赛制） | 14,000+ 卡牌 | MIT |
-| [PTCG Live zh-mod](https://github.com/Hill-98/ptcg-live-zh-mod) | 简中译名（卡名/招式） | 14,272 张卡名 100% | 开源 |
+| [TCGdex](https://github.com/tcgdex/cards-database) | 卡牌元数据（HP/属性/弱点/抗性/赛制） | 全卡池 | MIT |
+| [PTCG Live zh-mod](https://github.com/Hill-98/ptcg-live-zh-mod) | 简中译名（卡名/招式） | 卡名全覆盖 | 开源 |
 | 官方规则 PDF | 规则书/赛事手册/Errata | 待用户提供 | — |
 
 ## 限制
 
 - 简中赛制/轮替使用国际版数据（TCGdex `legal` 字段），非简中特有规则
-- 招式名/文本约 47% 已由社区翻译，未覆盖部分暂用英文
+- 招式名/文本部分已由社区翻译，未覆盖部分暂用英文
 - 环境分析（meta）、收藏向功能不在 MVP 范围
 
 ## 致谢
@@ -118,7 +118,7 @@ pokemon-tcg-wiki/
 本项目基于以下开源项目构建，特此致谢：
 
 - **[TCGdex](https://github.com/tcgdex/cards-database)** — Pokémon TCG 卡牌数据库，提供结构化卡牌元数据（HP/属性/弱点/抗性/赛制）。MIT License。
-- **[PTCG Live zh-mod](https://github.com/Hill-98/ptcg-live-zh-mod)** — PTCG Live 中文化模组，提供 14,272 张卡牌的简中译名及游戏文本翻译。[Paratranz 项目 #9617](https://paratranz.cn/projects/9617) 社区翻译。
+- **[PTCG Live zh-mod](https://github.com/Hill-98/ptcg-live-zh-mod)** — PTCG Live 中文化模组，提供卡牌简中译名及游戏文本翻译。[Paratranz 项目 #9617](https://paratranz.cn/projects/9617) 社区翻译。
 - **[Kuuusoda/magic-skill](https://github.com/Kuuusoda/magic-skill)** — 万智牌知识库工具链的开创性工作，mtg-wiki-hermes 的源头项目。本项目 Pipeline 架构思想经 mtg-wiki-hermes 传递至此。
 
 感谢以上项目的作者和贡献者。本项目的简中翻译数据来源于 PTCG Live zh-mod 社区翻译成果，未做修改。
